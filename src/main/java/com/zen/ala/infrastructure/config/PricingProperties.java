@@ -9,5 +9,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "pricing.discount")
 public class PricingProperties {
   private BigDecimal percentage;
-  private Map<Integer, BigDecimal> thresholds;
+  private Map<Integer, BigDecimal> quantityThresholds;
 }

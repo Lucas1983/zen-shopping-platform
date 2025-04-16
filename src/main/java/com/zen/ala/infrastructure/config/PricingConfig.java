@@ -15,7 +15,7 @@ public class PricingConfig {
 
   @Bean
   public QuantityDiscountPolicy quantityDiscountPolicy(PricingProperties props) {
-    NavigableMap<Integer, BigDecimal> thresholds = new TreeMap<>(props.getThresholds());
+    NavigableMap<Integer, BigDecimal> thresholds = new TreeMap<>(props.getQuantityThresholds());
     return new QuantityDiscountPolicy(thresholds);
   }
 
