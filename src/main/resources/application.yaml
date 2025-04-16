@@ -14,3 +14,12 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+pricing:
+  discount:
+    percentage: 0.10
+    quantity:
+      thresholds:
+        "10": 0.05
+        "20": 0.10
+        "50": 0.15
