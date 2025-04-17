@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ProductRetrieverService implements ProductRetriever {
+public class ProductRetrievalService implements ProductRetriever {
 
   private final ProductLoader productLoader;
 
