@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: shopping-platform
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+pricing:
+  discount:
+    percentage: 0.10
+    quantityThresholds:
+      "10": 0.05
+      "20": 0.10
+      "50": 0.15
