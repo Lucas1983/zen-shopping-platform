@@ -2,15 +2,19 @@ package com.zen.ala.domain.model;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /** Product domain model */
 @Getter
-@RequiredArgsConstructor
+@Setter
+@AllArgsConstructor
 public class Product {
 
-  private final UUID id;
-  private final String name;
-  private final BigDecimal price;
+  private UUID id;
+  private String name;
+  private BigDecimal price;
 }
