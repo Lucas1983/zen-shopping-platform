@@ -1,9 +1,8 @@
 package com.zen.ala.infrastructure.web.controller;
 
+import com.zen.ala.domain.error.InvalidDiscountStrategyException;
 import com.zen.ala.domain.model.Product;
-import com.zen.ala.domain.port.in.ProductRetriever;
-import com.zen.ala.domain.port.out.ProductLoader;
-import com.zen.ala.domain.service.PriceCalculatorService;
+import com.zen.ala.domain.port.in.ProductInboundPort;
 import com.zen.ala.infrastructure.web.dto.ProductRequestDto;
 import com.zen.ala.infrastructure.web.dto.ProductResponseDto;
 import com.zen.ala.infrastructure.web.mapper.ProductRequestDtoMapper;
@@ -22,9 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ProductController {
 
-  private final ProductRetriever productRetriever;
-  private final ProductLoader productLoader;
-  private final PriceCalculatorService priceCalculator;
+  private final ProductInboundPort productInboundPort;
   private final ProductRequestDtoMapper productRequestDtoMapper;
   private final ProductResponseDtoMapper productResponseDtoMapper;
 
@@ -36,7 +33,8 @@ public class ProductController {
    */
   @GetMapping("/{id}")
   public ResponseEntity<ProductResponseDto> getById(@PathVariable UUID id) {
-    Product product = productRetriever.getProductById(id);
+
+    Product product = productInboundPort.getProductById(id);
     return ResponseEntity.ok(productResponseDtoMapper.toDto(product));
   }
 
@@ -47,8 +45,9 @@ public class ProductController {
    */
   @GetMapping
   public ResponseEntity<List<ProductResponseDto>> getAll() {
+
     List<ProductResponseDto> productDtos =
-        productRetriever.getAllProducts().stream()
+        productInboundPort.getAllProducts().stream()
             .map(productResponseDtoMapper::toDto)
             .collect(Collectors.toList());
     return ResponseEntity.ok(productDtos);
@@ -62,8 +61,9 @@ public class ProductController {
    */
   @PostMapping
   public ResponseEntity<ProductResponseDto> createProduct(@RequestBody ProductRequestDto request) {
+
     Product product = productRequestDtoMapper.toDomain(request);
-    productLoader.saveProduct(product);
+    product = productInboundPort.saveProduct(product);
     return ResponseEntity.ok(productResponseDtoMapper.toDto(product));
   }
 
@@ -77,8 +77,9 @@ public class ProductController {
   @PutMapping("/{id}")
   public ResponseEntity<ProductResponseDto> updateProduct(
       @PathVariable UUID id, @RequestBody ProductRequestDto request) {
+
     Product product = productRequestDtoMapper.toDomain(id, request);
-    productLoader.saveProduct(product);
+    productInboundPort.saveProduct(product);
     return ResponseEntity.ok(productResponseDtoMapper.toDto(product));
   }
 
@@ -90,22 +91,36 @@ public class ProductController {
    */
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
-    productLoader.deleteProduct(id);
+
+    productInboundPort.deleteProduct(id);
     return ResponseEntity.noContent().build();
   }
 
   /**
-   * Calculates the price of a product based on its quantity.
+   * Calculates the price of a product based on quantity and discount strategy.
    *
    * @param id the UUID of the product
    * @param quantity the quantity of the product
-   * @return the calculated price
+   * @param discountType the type of discount
+   * @param discountPolicy the discount policy
+   * @return the final price after applying the discount
    */
   @GetMapping("/{id}/calculate-price")
   public ResponseEntity<BigDecimal> calculatePrice(
-      @PathVariable UUID id, @RequestParam int quantity) {
-    Product product = productRetriever.getProductById(id);
-    BigDecimal finalPrice = priceCalculator.calculatePrice(product.getPrice(), quantity);
+      @PathVariable UUID id,
+      @RequestParam int quantity,
+      @RequestParam String discountType,
+      @RequestParam String discountPolicy) {
+
+    if (discountType == null || discountPolicy == null) {
+      throw new InvalidDiscountStrategyException(
+          "DiscountType and/or DiscountPolicy cannot be empty");
+    }
+
+    Product product = productInboundPort.getProductById(id);
+    BigDecimal finalPrice =
+        productInboundPort.calculateDiscountedPrice(
+            product.getPrice(), quantity, discountType, discountPolicy);
     return ResponseEntity.ok(finalPrice);
   }
 }
