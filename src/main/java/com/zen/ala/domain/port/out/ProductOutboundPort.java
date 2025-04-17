@@ -9,7 +9,7 @@ import java.util.UUID;
  *
  * <p>Used to load products from the infrastructure
  */
-public interface ProductLoader {
+public interface ProductOutboundPort {
 
   /**
    * Find product by id
@@ -30,8 +30,17 @@ public interface ProductLoader {
    * Save product
    *
    * @param product - product to save
+   * @return Product
    */
-  void saveProduct(Product product);
+  Product saveProduct(Product product);
+
+  /**
+   * Update product
+   *
+   * @param product - product to update
+   * @return Product
+   */
+  Product updateProduct(Product product);
 
   /**
    * Delete product
