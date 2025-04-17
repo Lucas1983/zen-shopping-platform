@@ -38,6 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 })
 class ProductControllerTest {
 
+  public static final String PRODUCTS = "/v1/products";
   @Autowired private MockMvc mockMvc;
 
   @MockitoBean private ProductService productService;
@@ -57,7 +58,7 @@ class ProductControllerTest {
 
     // then
     mockMvc
-        .perform(get("/products/" + productId).accept(MediaType.APPLICATION_JSON))
+        .perform(get(PRODUCTS + "/" + productId).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value("Product"))
         .andExpect(jsonPath("$.price").value(100));
@@ -77,7 +78,7 @@ class ProductControllerTest {
 
     // then
     mockMvc
-        .perform(get("/products").accept(MediaType.APPLICATION_JSON))
+        .perform(get(PRODUCTS).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(2))
         .andExpect(jsonPath("$[0].name").value("Product 1"))
@@ -93,7 +94,7 @@ class ProductControllerTest {
     // then
     mockMvc
         .perform(
-            post("/products")
+            post(PRODUCTS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -123,7 +124,7 @@ class ProductControllerTest {
     //  then
     mockMvc
         .perform(
-            put("/products/" + productId)
+            put(PRODUCTS + "/" + productId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -146,7 +147,7 @@ class ProductControllerTest {
     doNothing().when(productRepositoryAdapter).deleteProduct(productId);
 
     //  then
-    mockMvc.perform(delete("/products/" + productId)).andExpect(status().isNoContent());
+    mockMvc.perform(delete(PRODUCTS + "/" + productId)).andExpect(status().isNoContent());
   }
 
   @Test
@@ -162,7 +163,7 @@ class ProductControllerTest {
     // when + then
     mockMvc
         .perform(
-            get("/products/" + productId + "/calculate-price")
+            get(PRODUCTS + "/" + productId + "/calculate-price")
                 .param("quantity", "1")
                 .param("discountType", "QUANTITY")
                 .param("discountPolicy", "CUMULATIVE")
@@ -180,7 +181,7 @@ class ProductControllerTest {
 
     // when + then
     mockMvc
-        .perform(get("/products/" + productId))
+        .perform(get(PRODUCTS + "/" + productId))
         .andExpect(status().isNotFound())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.status").value(404))
@@ -204,7 +205,7 @@ class ProductControllerTest {
     //  then
     mockMvc
         .perform(
-            get("/products/" + productId + "/calculate-price")
+            get(PRODUCTS + "/" + productId + "/calculate-price")
                 .param("quantity", "10")
                 .param("discountType", "")
                 .param("discountPolicy", ""))
@@ -224,7 +225,7 @@ class ProductControllerTest {
 
     // when + then
     mockMvc
-        .perform(get("/products/" + productId))
+        .perform(get(PRODUCTS + productId))
         .andExpect(status().isInternalServerError())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.status").value(500))

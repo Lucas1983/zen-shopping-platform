@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 /** ProductController is responsible for handling HTTP requests related to products. */
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
 
