@@ -1,8 +1,6 @@
 package com.zen.ala.infrastructure.persistance.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -19,7 +17,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProductEntity {
 
-  @Id private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private UUID id;
 
   private String name;
 
