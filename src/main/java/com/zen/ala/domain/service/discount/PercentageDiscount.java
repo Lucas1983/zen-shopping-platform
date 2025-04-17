@@ -3,16 +3,16 @@ package com.zen.ala.domain.service.discount;
 import java.math.BigDecimal;
 
 /**
- * A discount policy that applies a percentage discount to the base price.
+ * A discount that applies a percentage discount to the base price.
  *
- * <p>This class implements the {@link DiscountPolicy} interface and provides a method to apply a
+ * <p>This class implements the {@link Discount} interface and provides a method to apply a
  * percentage discount to a given base price based on the specified discount rate.
  */
-public class PercentageDiscountPolicy implements DiscountPolicy {
+public class PercentageDiscount implements Discount {
 
   private final BigDecimal discountRate;
 
-  public PercentageDiscountPolicy(BigDecimal discountRate) {
+  public PercentageDiscount(BigDecimal discountRate) {
     this.discountRate = discountRate;
   }
 

@@ -4,16 +4,16 @@ import java.math.BigDecimal;
 import java.util.NavigableMap;
 
 /**
- * A discount policy that applies a quantity-based discount to the base price.
+ * A discount that applies a quantity-based discount to the base price.
  *
- * <p>This class implements the {@link DiscountPolicy} interface and provides a method to apply a
+ * <p>This class implements the {@link Discount} interface and provides a method to apply a
  * quantity-based discount to a given base price based on the specified quantity thresholds.
  */
-public class QuantityDiscountPolicy implements DiscountPolicy {
+public class QuantityDiscount implements Discount {
 
   private final NavigableMap<Integer, BigDecimal> quantityThresholds;
 
-  public QuantityDiscountPolicy(NavigableMap<Integer, BigDecimal> quantityThresholds) {
+  public QuantityDiscount(NavigableMap<Integer, BigDecimal> quantityThresholds) {
     this.quantityThresholds = quantityThresholds;
   }
 

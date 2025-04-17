@@ -1,30 +1,73 @@
 package com.zen.ala.domain.service;
 
-import com.zen.ala.domain.service.discount.DiscountPolicy;
+import com.zen.ala.domain.service.discount.Discount;
+import com.zen.ala.domain.service.discount.DiscountStrategy;
+import com.zen.ala.domain.service.discount.PercentageDiscount;
+import com.zen.ala.domain.service.discount.QuantityDiscount;
+import com.zen.ala.domain.service.discount.dict.DiscountType;
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 /**
- * Service for calculating the total price of items based on unit price and quantity.
+ * Service for calculating prices with discounts.
  *
- * <p>This service applies various discount policies to the total price based on the specified
- * quantity.
+ * <p>This service provides methods to calculate the final price of a product based on its unit
+ * price, quantity, and applicable discounts. It supports different discount strategies, including
+ * cumulative and highest discount policies.
  */
+@RequiredArgsConstructor
 public class PriceCalculatorService {
 
-  private final List<DiscountPolicy> discountPolicies;
+  private final List<Discount> discounts;
 
-  public PriceCalculatorService(List<DiscountPolicy> discountPolicies) {
-    this.discountPolicies = discountPolicies;
+  /**
+   * Calculates the final price based on the unit price, quantity, and discount strategy.
+   *
+   * @param unitPrice the unit price of the product
+   * @param quantity the quantity of products
+   * @param discountStrategy the discount strategy to apply
+   * @return the final price after applying discounts
+   */
+  public BigDecimal calculatePrice(
+      BigDecimal unitPrice, int quantity, DiscountStrategy discountStrategy) {
+
+    BigDecimal originalTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
+
+    List<Discount> selectedDiscounts = selectDiscounts(discountStrategy.getDiscountType());
+
+    return switch (discountStrategy.getDiscountPolicy()) {
+      case CUMULATIVE -> calculateCumulativePrice(quantity, originalTotal, selectedDiscounts);
+      case HIGHEST -> calculateHighestPrice(quantity, originalTotal, selectedDiscounts);
+    };
   }
 
-  public BigDecimal calculatePrice(BigDecimal unitPrice, int quantity) {
-    BigDecimal total = unitPrice.multiply(BigDecimal.valueOf(quantity));
+  private List<Discount> selectDiscounts(DiscountType discountType) {
+    return switch (discountType) {
+      case QUANTITY ->
+          discounts.stream().filter(policy -> policy instanceof QuantityDiscount).toList();
+      case PERCENTAGE ->
+          discounts.stream().filter(policy -> policy instanceof PercentageDiscount).toList();
+      case BOTH -> discounts;
+    };
+  }
 
-    for (DiscountPolicy policy : discountPolicies) {
-      total = policy.apply(total, quantity);
+  private BigDecimal calculateCumulativePrice(
+      int quantity, BigDecimal total, List<Discount> selectedDiscounts) {
+
+    BigDecimal result = total;
+    for (Discount discount : selectedDiscounts) {
+      result = discount.apply(result, quantity);
     }
+    return result;
+  }
 
-    return total;
+  private BigDecimal calculateHighestPrice(
+      int quantity, BigDecimal total, List<Discount> selectedDiscounts) {
+
+    return selectedDiscounts.stream()
+        .map(discount -> discount.apply(total, quantity))
+        .min(BigDecimal::compareTo)
+        .orElse(total);
   }
 }
