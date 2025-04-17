@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Product loader port
+ * Product outbound port
  *
- * <p>Used to load products from the infrastructure
+ * <p>Used to manage products from the infrastructure
  */
 public interface ProductOutboundPort {
 

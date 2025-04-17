@@ -49,4 +49,16 @@ public interface ProductInboundPort {
    * @param id - product id
    */
   void deleteProduct(UUID id);
+
+  /**
+   * Calculate discounted price
+   *
+   * @param unitPrice - unit price of product
+   * @param quantity - quantity of product
+   * @param discountType - discount type
+   * @param discountPolicy - discount policy
+   * @return BigDecimal
+   */
+  BigDecimal calculateDiscountedPrice(
+      BigDecimal unitPrice, int quantity, String discountType, String discountPolicy);
 }
