@@ -118,7 +118,6 @@ public class PriceCalculatorServiceTest {
     // 100 * 50 = 5000
     // -15% quantity discount => 4250
     // -10% percentage discount => 4500
-    // wybieramy 4250
     assertThat(result).isEqualByComparingTo(BigDecimal.valueOf(4250));
   }
 }
