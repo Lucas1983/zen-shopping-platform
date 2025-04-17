@@ -17,8 +17,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ProductRequestDtoMapper {
 
-  ProductRequestDto toDto(Product product);
-
   Product toDomain(ProductRequestDto dto);
 
   Product toDomain(UUID id, ProductRequestDto dto);

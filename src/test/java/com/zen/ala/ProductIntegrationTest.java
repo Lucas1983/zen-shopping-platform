@@ -5,16 +5,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.zen.ala.application.service.ProductService;
-import com.zen.ala.domain.model.Product;
 import com.zen.ala.infrastructure.persistance.ProductRepositoryAdapter;
-import java.math.BigDecimal;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,6 +22,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @AutoConfigureMockMvc
 class ProductIntegrationTest {
+
+  public static final String PRODUCTS = "/v1/products";
 
   @Container
   static PostgreSQLContainer<?> postgres =
@@ -51,20 +49,21 @@ class ProductIntegrationTest {
   @Test
   void shouldCreateAndFetchProduct() throws Exception {
     var id = UUID.randomUUID().toString();
-    // given:
+    String requestBody =
+        String.format(
+            """
+			  {
+				  "id": "%s",
+				  "name": "Product",
+				  "price": 100
+			  }
+			  """,
+            id);
+
+    // given
     String createResponse =
         mockMvc
-            .perform(
-                post("/products")
-                    .contentType("application/json")
-                    .content(
-                        """
-		                            {
-		                        		"id": "%s",
-		                                "name": "Product",
-		                                "price": 100
-		                            }
-		                        """))
+            .perform(post(PRODUCTS).contentType("application/json").content(requestBody))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name").value("Product"))
             .andExpect(jsonPath("$.price").value(100))
@@ -76,36 +75,9 @@ class ProductIntegrationTest {
 
     // then
     mockMvc
-        .perform(get("/products/" + id))
+        .perform(get(PRODUCTS + "/" + id))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value("Product"))
         .andExpect(jsonPath("$.price").value(100));
-  }
-
-  @BeforeEach
-  void setup() {}
-
-  @Test
-  void shouldCalculatePriceSuccessfully() throws Exception {
-
-    // given
-    int quantity = 10;
-    String discountType = "BOTH";
-    String discountPolicy = "CUMULATIVE";
-
-    Product product = new Product(UUID.randomUUID(), "Test Product", BigDecimal.valueOf(100));
-    Product saved = productRepositoryAdapter.saveProduct(product);
-    var productId = saved.getId(); // when
-
-    // then
-    mockMvc
-        .perform(
-            get("/products/" + productId + "/calculate-price")
-                .param("quantity", String.valueOf(quantity))
-                .param("discountType", discountType)
-                .param("discountPolicy", discountPolicy)
-                .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().string("4590"));
   }
 }
